@@ -1,22 +1,23 @@
 {
-  "name": "mcp-notepad-watcher-monorepo",
-  "version": "2.0.0",
-  "private": true,
-  "description": "MCP Notepad Watcher - Monorepo for server and bridge packages",
-  "workspaces": [
-    "packages/*"
-  ],
+  "name": "mcp-notepad-watcher",
+  "version": "1.0.0",
+  "description": "MCP server that watches a notepad file for human input injection into Cursor conversations",
+  "main": "dist/index.js",
+  "type": "module",
   "scripts": {
-    "build": "npm run build --workspaces",
-    "build:server": "npm run build -w packages/server",
-    "build:bridge": "npm run build -w packages/bridge",
-    "start:server": "npm run start -w packages/server",
-    "start:bridge": "npm run start -w packages/bridge",
-    "dev:server": "npm run dev -w packages/server",
-    "dev:bridge": "npm run dev -w packages/bridge"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
   },
   "devDependencies": {
+    "@types/node": "^20.10.0",
     "typescript": "^5.3.0"
+  },
+  "bin": {
+    "mcp-notepad-watcher": "./dist/index.js"
   },
   "engines": {
     "node": ">=18"

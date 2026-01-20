@@ -1,41 +1,24 @@
 # MCP Notepad Watcher
 
-A Model Context Protocol (MCP) system that allows AI agents to receive human input through a local notepad file, with the server hosted remotely on Railway.
+A Model Context Protocol (MCP) server that allows AI agents to receive human input through a local notepad file.
 
-## Architecture
+## Features
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      YOUR LOCAL MACHINE                          │
-│  ┌──────────────────┐    ┌─────────────────────────────────┐   │
-│  │ cursor-notepad.txt│◄──►│    mcp-notepad-bridge          │   │
-│  │ (Desktop file)    │    │    (auto-started by Cursor)    │   │
-│  └──────────────────┘    └──────────────┬──────────────────┘   │
-└─────────────────────────────────────────┼──────────────────────┘
-                                          │ WebSocket
-                                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                         RAILWAY                                  │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │              mcp-notepad-server                          │   │
-│  │  - WebSocket hub for bridge connections                  │   │
-│  │  - MCP tool logic                                        │   │
-│  └──────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-```
+- **watch_notepad** - Wait for human input from a notepad file
+- **write_to_notepad** - Write messages to the notepad file
+- **clear_notepad** - Clear the notepad file
+- **read_notepad** - Read current contents without waiting
 
-## Setup
-
-### 1. Deploy Server to Railway
+## Installation
 
 ```bash
-cd packages/server
 npm install
 npm run build
-# Deploy to Railway via GitHub or Railway CLI
 ```
 
-### 2. Configure Cursor MCP
+## Usage
+
+### Configure Cursor MCP
 
 Add to your Cursor MCP configuration:
 
@@ -43,64 +26,51 @@ Add to your Cursor MCP configuration:
 {
   "mcpServers": {
     "notepad": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-notepad-bridge",
-        "--server", "wss://your-app.railway.app/bridge",
-        "--file", "C:/Users/YOUR_USERNAME/Desktop/cursor-notepad.txt"
-      ]
+      "command": "node",
+      "args": ["C:/path/to/mcp-notepad-watcher/dist/index.js"],
+      "env": {
+        "NOTEPAD_PATH": "C:/Users/YOUR_USERNAME/Desktop/cursor-notepad.txt"
+      }
     }
   }
 }
 ```
 
-### 3. Use It
+### Default File Location
 
-1. Open Cursor
-2. Edit your Desktop `cursor-notepad.txt` file
-3. Write your prompt and press Enter twice (blank line)
-4. The AI agent receives your input!
+If `NOTEPAD_PATH` is not set, the notepad file defaults to:
+- Windows: `%USERPROFILE%/cursor-notepad.txt`
+- Mac/Linux: `~/cursor-notepad.txt`
 
-## Packages
+### How It Works
 
-### mcp-notepad-server
+1. The AI agent calls `watch_notepad` to wait for your input
+2. You write your prompt in the notepad file
+3. Press Enter twice (create a blank line) to submit
+4. The AI receives your input and continues
+5. Type "STOP" to end the session
 
-The Railway-hosted server that:
-- Accepts WebSocket connections from bridges
-- Routes MCP tool calls to connected bridges
-- Provides health checks and monitoring
+## Example Session
 
-### mcp-notepad-bridge
+In the notepad file:
+```
+# Cursor Agent Notepad
+# Write your prompts below, separated by double-enter (blank line)
 
-The local bridge that:
-- Watches your local notepad file for changes
-- Connects to the Railway server via WebSocket
-- Exposes MCP tools to Cursor via STDIO
+[AGENT WAITING FOR INPUT]
+[Write your response below, then press Enter twice]
 
-## MCP Tools
+I want you to create a hello world function
 
-| Tool | Description |
-|------|-------------|
-| `watch_notepad` | Wait for human input from the notepad file |
-| `write_to_notepad` | Write a message to the notepad file |
-| `clear_notepad` | Clear the notepad file |
-| `read_notepad` | Read current contents of the notepad |
+<<<PROCESSED>>>
+```
 
 ## Development
 
 ```bash
-# Install all dependencies
-npm install
-
-# Build all packages
-npm run build
-
-# Run server locally
-npm run dev:server
-
-# Run bridge locally
-npm run dev:bridge -- --server ws://localhost:3000/bridge --file ~/test-notepad.txt
+npm run dev  # Watch mode
+npm run build  # Build
+npm start  # Run
 ```
 
 ## License
