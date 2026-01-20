@@ -1,0 +1,24 @@
+{
+  "name": "mcp-notepad-watcher-monorepo",
+  "version": "2.0.0",
+  "private": true,
+  "description": "MCP Notepad Watcher - Monorepo for server and bridge packages",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:server": "npm run build -w packages/server",
+    "build:bridge": "npm run build -w packages/bridge",
+    "start:server": "npm run start -w packages/server",
+    "start:bridge": "npm run start -w packages/bridge",
+    "dev:server": "npm run dev -w packages/server",
+    "dev:bridge": "npm run dev -w packages/bridge"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
